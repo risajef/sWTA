@@ -1,0 +1,34 @@
+Simple Soft-Winner-Take-All Network
+
+My computational model consists of units which operate in a synchronized manner.
+A unit 'u' is defined as follows:
+'u' has a non-negative amount of incoming and outgoing edges.
+An edge has always the weight 1. (There are no weights.)
+An edge can be recurrent i.e. the source and target of an edge might be the same unit.
+Two units can have at most one connecting edge. (Also a unit can have at most one recurrent edge) 
+'u' can be active or inactive.
+Outgoing edges of active units get the value 1 assigned to.
+Outgoing edges of inactive units get the value 0 assigned to.
+'u' can have an incoming offset-edge. This edge is always 1.
+'u' is embedded in exactly one soft-winner-take-all network (sWTA).
+A sWTA contains a non-empty set of units.
+At every time-step in a given sWTA the units sum up the values of their incoming edges. Now at the next time-step only the units with highest sum in this sWTA become active. If there are multiple units with the highest sum all of them become active.
+The model might need some initialization. (Some input might be given to specific units to force the network into the desired state.)
+The problem input is given by special units. These need to be redefined for the problem. In simulating an FSM the input needs to be given one character at a time where in Logic the whole formula gets evaluated in parallel. For the sake of formality I show how serializing a parallel input is done.
+
+I will show how to implement positive integer weights on the edges.
+I will show that this model is functional complete: It can compute every Boolean expression. (I will show the implementation of NAND)
+I will show that this model can implement FSM
+If I have time I will show that this model also can implement TMs.
+
+
+disadvantages:
+- It needs linear amount of units => The problem size needs to be known at the beginning to construct the network. This can also be abstracted to just assume to have an infinite amount of units where we just need to define their behavior. (TM implementation uses this)
+- gets visually complex fast
+
+advantages:
++ physically implementable.
++ computational power
+
+
+Things I did not look into: pipeline computation.
