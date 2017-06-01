@@ -4,14 +4,14 @@ from matplotlib.patches import FancyArrowPatch, Circle
 import numpy as np
 
 
-def connect(l1, l2, arr):
+def connect(l1, l2, arr=[]):
     ret = []
     for e in arr:
         ret.append(((l1, e[0]), (l2, e[1])))
     return ret
 
 
-# TODO Shape for recurrent
+# TODO Shape for recurrent, reccurent edges don't get displayed
 def weights(w=1):
     pos = {}
     labels = {}
@@ -64,6 +64,50 @@ def two_bit_setup(inp=[False, False]):
 
     labels = {(0, 0): '1', (0, 1): 'a', (0, 2): 'b', (2, 0): '!a+!b', (2, 1): 'a+!b', (2, 2): 'a+b', (2, 3): '!a+b'}
 
+    return G, pos, labels, Edges, init, offset
+
+
+def three_bit_setup(inp=[False, False, False]):
+    G = nx.DiGraph()
+
+    layer_size = [4, 17, 8, 2]
+    Nodes = []
+    offset = []
+    labels = {}
+    pos = {}
+
+    for i, l in enumerate(layer_size):
+        Nodes.append([(i, t) for t in range(l)])
+        G.add_nodes_from([(i, t) for t in range(l)])
+        for t in range(l):
+            pos[(i, t)] = (i, t * (17 / (l - 1)))
+
+    init = [(0, 0)]
+    for i, e in enumerate(inp):
+        if e:
+            init.append((0, i + 1))
+
+    Edges = []
+    Edges.append(connect(0, 1, [(0, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (2, 6), (2, 7),
+                                (2, 8), (2, 9), (2, 10),
+                                (2, 11), (2, 12), (2, 13), (3, 4), (3, 5), (3, 8), (3, 12), (3, 13), (3, 14), (3, 15),
+                                (3, 16)]))
+    Edges.append(connect(1, 2, [(0, 0), (1, 1), (2, 1), (3, 1), (4, 2), (5, 2), (6, 3), (7, 3), (8, 4), (9, 5), (10, 5),
+                                (11, 5), (12, 6),
+                                (13, 6), (14, 7), (15, 7), (16, 7)]))
+
+    labels[(0, 0)] = '1'
+    labels[(0, 1)] = 'c'
+    labels[(0, 2)] = 'b'
+    labels[(0, 3)] = 'a'
+    labels[(2, 0)] = '!a+!b+!c'
+    labels[(2, 1)] = '!a+!b+c'
+    labels[(2, 2)] = 'a+!b+c'
+    labels[(2, 3)] = '!a+b+c'
+    labels[(2, 4)] = 'a+b+c'
+    labels[(2, 5)] = '!a+b+!c'
+    labels[(2, 6)] = 'a+b+!c'
+    labels[(2, 7)] = 'a+!b+!c'
     return G, pos, labels, Edges, init, offset
 
 
@@ -268,11 +312,27 @@ def Nor(inp=[False, False]):
     iterate(G, [G.nodes()], pos, labels, init, offset, 2000)
 
 
+def plus(inp=[False, False, False]):
+    G, pos, labels, Edges, init, offset = three_bit_setup(inp)
+
+    labels[(3, 0)] = "bit"
+    labels[(3, 1)] = "carry"
+
+    G.add_edges_from(connect(2, 3, [(1, 0), (4, 0), (5, 0), (7, 0)]))  # bit
+    G.add_edges_from(connect(2, 3, [(2, 1), (3, 1), (4, 1), (6, 1)]))  # carry
+    G.add_edges_from([((2, 0), (2, 0)), ((3, 0), (3, 0)), ((3, 1), (3, 1))])
+
+    for e in Edges:
+        G.add_edges_from(e)
+
+    iterate(G, [G.nodes()], pos, labels, init, offset, 2000)
+
+
 def timer(t=0):
     # G, pos, labels, init, offset
     G, pos, labels, init, offset = shoot_at(t)
 
-    iterate(G, [G.nodes()], pos, labels, init,  2000/(t/5))
+    iterate(G, [G.nodes()], pos, labels, init, 2000 / (t / 5))
 
 
 def edge_weight(w=1):
@@ -287,7 +347,8 @@ def FSM(inp=[0, 1, 0, 1]):
     iterate(G, WTAs, pos, labels, init, offset)
 
 
+plus([True, False, True])
 # FSM([1, 1, 0, 1, 0])
 # Nand([True, True])
 # Nor([True,False])
-edge_weight(3)
+# edge_weight(3)

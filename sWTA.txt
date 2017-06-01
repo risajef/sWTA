@@ -14,7 +14,6 @@ Outgoing edges of inactive units get the value 0 assigned to.
 A sWTA contains a non-empty set of units.
 At every time-step in a given sWTA the units sum up the values of their incoming edges. Now at the next time-step only the units with highest sum in this sWTA become active. If there are multiple units with the highest sum all of them become active.
 The model might need some initialization. (Some input might be given to specific units to force the network into the desired state.)
-The problem input is given by special units. These need to be redefined for the problem. In simulating an FSM the input needs to be given one character at a time where in Logic the whole formula gets evaluated in parallel. For the sake of formality I show how serializing a parallel input is done.
 
 I will show how to implement positive integer weights on the edges.
 I will show that this model is functional complete: It can compute every Boolean expression. (I will show the implementation of NAND)
